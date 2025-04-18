@@ -1,9 +1,12 @@
 {
   "backend": {
-    "name": "github",
-    "repo": "WhyCarb/whycarb-site",
-    "branch": "main"
-  },
+  "name": "github",
+  "repo": "WhyCarb/whycarb-site",
+  "branch": "main",
+  "base_url": "https://auth.bybilly.uk",
+  "auth_endpoint": "auth",
+  "app_id": "190ee084cc2fbded1919fc670876cdd27f3cf567"
+},
   "media_folder": "images/uploads",
   "public_folder": "/images/uploads",
   "collections": [
