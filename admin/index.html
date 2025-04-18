@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <title>WhyCarb CMS</title>
     <script>
+      // This prevents Netlify default behavior
       window.CMS_MANUAL_INIT = true;
     </script>
     <script src="https://unpkg.com/decap-cms@latest/dist/decap-cms.js"></script>
@@ -11,13 +12,16 @@
       fetch('/admin/config.json')
         .then(response => response.json())
         .then(config => {
+          console.log("Loaded config:", config);
           if (window.CMS) {
             window.CMS.init({ config });
           } else {
-            console.error("CMS failed to load");
+            document.body.innerHTML = "<pre>CMS failed to load</pre>";
           }
         })
-        .catch(err => document.body.innerHTML = `<pre>${err}</pre>`);
+        .catch(err => {
+          document.body.innerHTML = `<pre>${err}</pre>`;
+        });
     </script>
   </head>
   <body>
