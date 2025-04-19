@@ -4,13 +4,14 @@
     <meta charset="UTF-8" />
     <title>WhyCarb CMS</title>
 
-    <!-- Stop auto init -->
+    <!-- Prevent automatic CMS init -->
     <script>
       window.CMS_MANUAL_INIT = true;
     </script>
 
-    <!-- Load Decap CMS -->
+    <!-- Load Decap CMS and js-yaml -->
     <script src="https://unpkg.com/decap-cms@^3.6.2/dist/decap-cms.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
   </head>
   <body>
     <div id="cms"></div>
@@ -18,19 +19,20 @@
     <script>
       async function initCMS() {
         try {
-          const response = await fetch("/admin/config.json");
-          const config = await response.json();
+          const response = await fetch("/admin/config.yml");
+          const text = await response.text();
+          const config = window.jsyaml.load(text);
 
-          console.log("✅ Custom CMS init starting with config:", config);
+          console.log("✅ Loaded YAML config:", config);
 
           window.CMS.init({
             config,
-            backend: config.backend
+            backend: config.backend,
           });
 
           console.log("🧠 Backend explicitly set to:", config.backend);
 
-          // Patch backend.auth after CMS has fully loaded
+          // Patch the backend.auth after CMS init
           const patchBackend = () => {
             try {
               const backend = window.CMS.getBackend?.();
@@ -41,8 +43,6 @@
               }
 
               console.log("🛠️ Overriding GitHub backend auth()");
-
-              const originalAuth = backend.auth?.bind(backend);
 
               backend.auth = async function () {
                 console.log("🔐 Using forced GitHub device flow");
@@ -57,8 +57,8 @@
                   body: JSON.stringify({
                     provider: "github",
                     site_id: window.location.hostname,
-                    scope: "repo"
-                  })
+                    scope: "repo",
+                  }),
                 });
 
                 const data = await res.json();
@@ -69,7 +69,6 @@
                   throw new Error("❌ GitHub login failed: " + JSON.stringify(data));
                 }
               };
-
             } catch (err) {
               console.error("💥 Backend patch failed:", err);
             }
@@ -78,7 +77,7 @@
           setTimeout(patchBackend, 1000);
 
         } catch (err) {
-          console.error("🔥 Could not load config.json", err);
+          console.error("🔥 Failed to load or parse config.yml", err);
         }
       }
 
