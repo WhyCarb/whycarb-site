@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <title>WhyCarb CMS</title>
 
-    <!-- Prevent automatic CMS init -->
+    <!-- Stop automatic init -->
     <script>
       window.CMS_MANUAL_INIT = true;
     </script>
@@ -30,36 +30,48 @@
 
           console.log("🧠 Backend explicitly set to:", config.backend);
 
-          // ⛏️ Override GitHub backend to force device flow via your Worker
-          class CustomGitHubBackend extends window.CMS.BackendClass.GitHub {
-            async auth() {
-              console.log("🔐 Using custom GitHub device flow");
+          // Delay backend override until CMS internals are ready
+          const overrideGitHubBackend = () => {
+            const GitHub = window?.netlify?.cms?.lib?.auth?.GitHub;
 
-              const authEndpoint = this.api?.authEndpoint || "auth";
-              const baseUrl = this.api?.baseUrl || "";
-              const url = `${baseUrl.replace(/\/$/, "")}/${authEndpoint.replace(/^\//, "")}`;
+            if (!GitHub) {
+              console.warn("⏳ GitHub backend not available yet, retrying...");
+              return setTimeout(overrideGitHubBackend, 200);
+            }
 
-              const res = await fetch(url, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                  provider: "github",
-                  site_id: window.location.hostname,
-                  scope: "repo"
-                })
-              });
+            class CustomGitHubBackend extends GitHub {
+              async auth() {
+                console.log("🔐 Using custom GitHub device flow");
 
-              const data = await res.json();
-              if (data && data.token) {
-                console.log("✅ Got GitHub token from proxy");
-                return data.token;
-              } else {
-                throw new Error("❌ GitHub login failed: " + JSON.stringify(data));
+                const authEndpoint = this.api?.authEndpoint || "auth";
+                const baseUrl = this.api?.baseUrl || "";
+                const url = `${baseUrl.replace(/\/$/, "")}/${authEndpoint.replace(/^\//, "")}`;
+
+                const res = await fetch(url, {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    provider: "github",
+                    site_id: window.location.hostname,
+                    scope: "repo"
+                  })
+                });
+
+                const data = await res.json();
+                if (data && data.token) {
+                  console.log("✅ Got GitHub token from proxy");
+                  return data.token;
+                } else {
+                  throw new Error("❌ GitHub login failed: " + JSON.stringify(data));
+                }
               }
             }
-          }
 
-          window.CMS.registerBackend("github", CustomGitHubBackend);
+            console.log("🛠️ Registering custom GitHub backend");
+            window.CMS.registerBackend("github", CustomGitHubBackend);
+          };
+
+          overrideGitHubBackend();
 
         } catch (err) {
           console.error("🔥 Could not load config.json", err);
