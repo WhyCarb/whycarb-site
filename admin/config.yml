@@ -14,12 +14,25 @@ collections:
     label: Pages
     files:
       - file: "index.md"
-        label: "Home Page"
-        name: "home"
+        label: Home Page
+        name: home
         fields:
-          - label: "Title"
-            name: "title"
-            widget: "string"
-          - label: "Body"
-            name: "body"
-            widget: "markdown"
+          - label: Title
+            name: title
+            widget: string
+          - label: Body
+            name: body
+            widget: markdown
+
+  - name: blog
+    label: Blog Posts
+    folder: "content/blog"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - label: Title
+        name: title
+        widget: string
+      - label: Body
+        name: body
+        widget: markdown
