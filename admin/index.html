@@ -25,9 +25,12 @@
           });
 
           window.CMS.registerEventListener({
-            name: "login",
-            handler: () => console.log("🔐 Login triggered")
-          });
+  name: "prePublish",
+  handler: ({ entry }) => {
+    console.log("📤 Attempting to publish:", entry);
+  }
+});
+
 
         } catch (err) {
           console.error("🔥 Could not load config.json", err);
