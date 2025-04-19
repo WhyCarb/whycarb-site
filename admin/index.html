@@ -19,7 +19,11 @@
 
           console.log("✅ Forcing Decap CMS init with config:", config);
 
-          window.CMS.init({ config });
+          window.CMS.init({
+  config,
+  backend: config.backend
+});
+
 
           window.CMS.registerEventListener({
             name: "login",
