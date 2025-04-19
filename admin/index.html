@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <title>WhyCarb CMS</title>
 
-    <!-- Prevent automatic CMS init -->
+    <!-- Prevent Decap from auto-initialising -->
     <script>
       window.CMS_MANUAL_INIT = true;
     </script>
@@ -32,7 +32,6 @@
 
           console.log("🧠 Backend explicitly set to:", config.backend);
 
-          // Patch the backend.auth after CMS init
           const patchBackend = () => {
             try {
               const backend = window.CMS.getBackend?.();
@@ -75,7 +74,6 @@
           };
 
           setTimeout(patchBackend, 1000);
-
         } catch (err) {
           console.error("🔥 Failed to load or parse config.yml", err);
         }
