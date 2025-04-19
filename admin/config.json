@@ -6,6 +6,7 @@
     "base_url": "https://pepperoni-auth.pepperoni-auth.workers.dev",
     "auth_endpoint": "auth",
     "app_id": "Ov23livJMEmYCqjFz490"
+    "site_domain": "whycarb-site.pages.dev"
   },
   "media_folder": "images/uploads",
   "public_folder": "/images/uploads",
