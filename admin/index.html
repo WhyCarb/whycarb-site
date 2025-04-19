@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <title>WhyCarb CMS</title>
 
-    <!-- Tell Decap not to auto-init -->
+    <!-- Prevent automatic CMS init -->
     <script>
       window.CMS_MANUAL_INIT = true;
     </script>
@@ -30,12 +30,42 @@
 
           console.log("🧠 Backend explicitly set to:", config.backend);
 
+          // ⛏️ Override GitHub backend to force device flow via your Worker
+          class CustomGitHubBackend extends window.CMS.BackendClass.GitHub {
+            async auth() {
+              console.log("🔐 Using custom GitHub device flow");
+
+              const authEndpoint = this.api?.authEndpoint || "auth";
+              const baseUrl = this.api?.baseUrl || "";
+              const url = `${baseUrl.replace(/\/$/, "")}/${authEndpoint.replace(/^\//, "")}`;
+
+              const res = await fetch(url, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  provider: "github",
+                  site_id: window.location.hostname,
+                  scope: "repo"
+                })
+              });
+
+              const data = await res.json();
+              if (data && data.token) {
+                console.log("✅ Got GitHub token from proxy");
+                return data.token;
+              } else {
+                throw new Error("❌ GitHub login failed: " + JSON.stringify(data));
+              }
+            }
+          }
+
+          window.CMS.registerBackend("github", CustomGitHubBackend);
+
         } catch (err) {
           console.error("🔥 Could not load config.json", err);
         }
       }
 
-      // Wait for CMS to load before init
       setTimeout(() => {
         if (window.CMS) {
           console.log("💡 CMS loaded, calling initCMS()");
