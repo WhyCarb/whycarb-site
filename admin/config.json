@@ -3,7 +3,7 @@
     "name": "github",
     "repo": "WhyCarb/whycarb-site",
     "branch": "main",
-    "base_url": "https://oauth-proxy.netlify.app",
+    "base_url": "https://pepperoni-auth.pepperoni-auth.workers.dev/",
     "auth_endpoint": "auth",
     "app_id": "Ov23livJMEmYCqjFz490"
   },
