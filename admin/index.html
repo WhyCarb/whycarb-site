@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <title>WhyCarb CMS</title>
 
-    <!-- Stop automatic init -->
+    <!-- Stop auto init -->
     <script>
       window.CMS_MANUAL_INIT = true;
     </script>
@@ -30,18 +30,22 @@
 
           console.log("🧠 Backend explicitly set to:", config.backend);
 
-          // Delay backend override until CMS internals are ready
-          const overrideGitHubBackend = () => {
-            const GitHub = window?.netlify?.cms?.lib?.auth?.GitHub;
+          // Patch backend.auth after CMS has fully loaded
+          const patchBackend = () => {
+            try {
+              const backend = window.CMS.getBackend?.();
 
-            if (!GitHub) {
-              console.warn("⏳ GitHub backend not available yet, retrying...");
-              return setTimeout(overrideGitHubBackend, 200);
-            }
+              if (!backend || backend.name !== "github") {
+                console.warn("⏳ GitHub backend not ready, retrying...");
+                return setTimeout(patchBackend, 300);
+              }
 
-            class CustomGitHubBackend extends GitHub {
-              async auth() {
-                console.log("🔐 Using custom GitHub device flow");
+              console.log("🛠️ Overriding GitHub backend auth()");
+
+              const originalAuth = backend.auth?.bind(backend);
+
+              backend.auth = async function () {
+                console.log("🔐 Using forced GitHub device flow");
 
                 const authEndpoint = this.api?.authEndpoint || "auth";
                 const baseUrl = this.api?.baseUrl || "";
@@ -64,14 +68,14 @@
                 } else {
                   throw new Error("❌ GitHub login failed: " + JSON.stringify(data));
                 }
-              }
-            }
+              };
 
-            console.log("🛠️ Registering custom GitHub backend");
-            window.CMS.registerBackend("github", CustomGitHubBackend);
+            } catch (err) {
+              console.error("💥 Backend patch failed:", err);
+            }
           };
 
-          overrideGitHubBackend();
+          setTimeout(patchBackend, 1000);
 
         } catch (err) {
           console.error("🔥 Could not load config.json", err);
