@@ -3,21 +3,22 @@
   <head>
     <meta charset="UTF-8" />
     <title>WhyCarb CMS</title>
+    <script>
+      window.CMS_MANUAL_INIT = true;
+    </script>
     <script src="https://unpkg.com/decap-cms@^3.6.2/dist/decap-cms.js"></script>
   </head>
   <body>
     <script>
-      window.CMS_MANUAL_INIT = true;
-    </script>
-
-    <script>
       fetch("/admin/config.json")
         .then(res => res.json())
         .then(config => {
-          console.log("Manual CMS init with config:", config);
+          console.log("💡 Manually initializing Decap CMS with config:", config);
           window.CMS.init({ config });
-        });
+        })
+        .catch(err => console.error("🔥 Failed to load config.json", err));
     </script>
   </body>
 </html>
+
 
