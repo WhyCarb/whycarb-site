@@ -1,12 +1,12 @@
 {
   "backend": {
-  "name": "github",
-  "repo": "WhyCarb/whycarb-site",
-  "branch": "main",
-  "base_url": "https://auth.bybilly.uk",
-  "auth_endpoint": "auth",
-  "app_id": "190ee084cc2fbded1919fc670876cdd27f3cf567"
-},
+    "name": "github",
+    "repo": "WhyCarb/whycarb-site",
+    "branch": "main",
+    "base_url": "https://pepperoni-auth.workers.dev",
+    "auth_endpoint": "auth",
+    "app_id": "Ov23livJMEmYCqjFz490"
+  },
   "media_folder": "images/uploads",
   "public_folder": "/images/uploads",
   "collections": [
@@ -27,3 +27,4 @@
     }
   ]
 }
+
