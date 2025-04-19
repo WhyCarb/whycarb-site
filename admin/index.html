@@ -3,9 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <title>WhyCarb CMS</title>
+
+    <!-- Tell Decap not to auto-init -->
     <script>
       window.CMS_MANUAL_INIT = true;
     </script>
+
+    <!-- Load Decap CMS -->
     <script src="https://unpkg.com/decap-cms@^3.6.2/dist/decap-cms.js"></script>
   </head>
   <body>
@@ -24,19 +28,14 @@
             backend: config.backend
           });
 
-          window.CMS.registerEventListener({
-  name: "prePublish",
-  handler: ({ entry }) => {
-    console.log("📤 Attempting to publish:", entry);
-  }
-});
-
+          console.log("🧠 Backend explicitly set to:", config.backend);
 
         } catch (err) {
           console.error("🔥 Could not load config.json", err);
         }
       }
 
+      // Wait for CMS to load before init
       setTimeout(() => {
         if (window.CMS) {
           console.log("💡 CMS loaded, calling initCMS()");
