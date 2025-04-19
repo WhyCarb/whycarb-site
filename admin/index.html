@@ -9,16 +9,36 @@
     <script src="https://unpkg.com/decap-cms@^3.6.2/dist/decap-cms.js"></script>
   </head>
   <body>
+    <div id="cms"></div>
+
     <script>
-      fetch("/admin/config.json")
-        .then(res => res.json())
-        .then(config => {
-          console.log("💡 Manually initializing Decap CMS with config:", config);
+      async function initCMS() {
+        try {
+          const response = await fetch("/admin/config.json");
+          const config = await response.json();
+
+          console.log("✅ Forcing Decap CMS init with config:", config);
+
           window.CMS.init({ config });
-        })
-        .catch(err => console.error("🔥 Failed to load config.json", err));
+
+          window.CMS.registerEventListener({
+            name: "login",
+            handler: () => console.log("🔐 Login triggered")
+          });
+
+          window.CMS.registerEventListener({
+            name: "prePublish",
+            handler: ({ entry }) => {
+              console.log("📤 Attempting to publish:", entry);
+            }
+          });
+
+        } catch (err) {
+          console.error("🔥 CMS config load failed:", err);
+        }
+      }
+
+      initCMS();
     </script>
   </body>
 </html>
-
-
